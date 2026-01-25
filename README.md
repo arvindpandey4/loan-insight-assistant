@@ -271,13 +271,7 @@ The application is deployed using a modern cloud infrastructure:
 
 ### **Arvind**
 
-Implemented the Core RAG Logic integration layer by connecting the retriever pipeline to the backend flow, ensuring query-to-retrieval works reliably with top-K similarity search and structured results.
-Built the full Agentic Logic layer using PydanticAI, including the Query Understanding Agent to interpret user queries and extract intent, the Loan Retrieval Agent to fetch relevant historical loan cases using FAISS similarity search, and the Explanation & Compliance Agent to convert retrieved evidence into structured, audit-friendly explanations.
-Defined and enforced Pydantic validation schemas across the agent pipeline and final API response formats to ensure strict response correctness and stability.
-Implemented the agent orchestration logic, controlling end-to-end flow between agents, including fallbacks for ambiguous queries and empty retrieval cases.
-Owned and executed the CI/CD pipeline setup using GitHub Actions, including automated checks for dependency installation, linting, backend unit tests, Docker build validation, and deployment automation.
-Led final deployment and release readiness by deploying the backend to Railway and frontend to Vercel, ensuring production health checks, smoke tests, and end-to-end workflow validation were successful.
-Delivered final production outputs including live deployment URLs, updated repository state, and comprehensive documentation for setup and usage.
+Implemented the core RAG integration by connecting the retriever pipeline to the backend flow and ensuring reliable top-K similarity search with structured outputs. Built the complete agentic layer using PydanticAI, including a Query Understanding Agent for intent extraction, a Loan Retrieval Agent for fetching relevant historical cases via FAISS, and an Explanation & Compliance Agent for generating audit-friendly, evidence-backed explanations. Defined strict Pydantic schemas for agent and API responses, and implemented orchestration logic with robust fallbacks for ambiguous queries and empty retrieval scenarios. Owned CI/CD using GitHub Actions with automated installs, linting, unit tests, Docker build validation, and deployment automation, then finalized production deployment (Railway backend + Vercel frontend) with successful health checks, smoke tests, and complete documentation.
 
 ---
 
