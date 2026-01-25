@@ -1,15 +1,15 @@
 from fastapi.testclient import TestClient
-from main import app
+import sys
 import os
 from unittest.mock import MagicMock, patch
 
+# Add parent directory to path to import main
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+from main import app
+
 # Create a TestClient
 client = TestClient(app)
-
-# Mock the loan_api to avoid actual RAG initialization during API tests if environment is missing
-# (Though in this case we have the .env so we might try real tests or mocked ones)
-# For reliability in CI/CD, we often want to mock the heavy logic unless it's an end-to-end test.
-# But "test_agent_quality.py" covers the logic. Here we just want to ensure endpoints exist and handle requests.
 
 def test_health_check():
     response = client.get("/health")
