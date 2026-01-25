@@ -6,7 +6,11 @@ import numpy as np
 from typing import Tuple, Dict, Any, List
 
 # Add the project root to sys.path to import rag modules
-project_root = str(Path(__file__).parent.parent)
+# project_root is the directory containing 'agent_system', 'rag', etc.
+# Since this file (api.py) is now in 'backend/', and 'agent_system' is in 'backend/agent_system',
+# the project root is effectively the directory containing this file.
+
+project_root = str(Path(__file__).parent)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -57,7 +61,7 @@ class LoanInsightAPI:
         """Calculate dashboard statistics from the CSV dataset"""
         try:
             # Path to the dataset - adjusting to the correct relative or absolute path
-            # Assuming the file is in the root directory as seen in `ls`
+            # Path to the dataset - assuming it's in the same project root
             csv_path = Path(project_root) / "hdfc_loan_dataset_full_enriched - hdfc_loan_dataset_full_enriched.csv"
             
             if not csv_path.exists():

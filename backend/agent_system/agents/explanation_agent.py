@@ -11,7 +11,11 @@ class ExplanationAgent:
         self.api_key = api_key or os.getenv('GROQ_API_KEY')
         self.client = None
         if self.api_key:
-            self.client = Groq(api_key=self.api_key)
+            try:
+                self.client = Groq(api_key=self.api_key)
+            except Exception as e:
+                print(f"[ERROR] Failed to initialize Groq client: {e}")
+                self.client = None
         else:
             print("[WARN] Groq API Key missing. ExplanationAgent will use placeholder logic.")
 
@@ -86,9 +90,15 @@ class ExplanationAgent:
         rejected = total - approved
         approval_rate = (approved / total) * 100
         
-        # Extract common patterns from original data
-        avg_cibil = sum(c.original_data.get('CIBIL_Score', 0) for c in cases) / total
-        avg_income = sum(c.original_data.get('Applicant_Income', 0) for c in cases) / total
+        # Extract common patterns from original data (with safe type conversion)
+        def safe_float(value, default=0):
+            try:
+                return float(value) if value else default
+            except (ValueError, TypeError):
+                return default
+        
+        avg_cibil = sum(safe_float(c.original_data.get('CIBIL_Score')) for c in cases) / total
+        avg_income = sum(safe_float(c.original_data.get('Applicant_Income')) for c in cases) / total
         
         # Construct a rich summary
         summary = (
@@ -111,11 +121,11 @@ class ExplanationAgent:
         if rejected_cases:
             risk_notes.append("Common factors in rejected cases:")
             # Check simple thresholds (heuritics)
-            low_cibil = sum(1 for c in rejected_cases if c.original_data.get('CIBIL_Score', 0) < 750)
+            low_cibil = sum(1 for c in rejected_cases if safe_float(c.original_data.get('CIBIL_Score')) < 750)
             if low_cibil > 0:
                 risk_notes.append(f"â€¢ Low CIBIL Score (<750) observed in {low_cibil} rejected cases.")
             
-            high_loan = sum(1 for c in rejected_cases if c.original_data.get('Loan_Amount', 0) > 5000000)
+            high_loan = sum(1 for c in rejected_cases if safe_float(c.original_data.get('Loan_Amount')) > 5000000)
             if high_loan > 0:
                 risk_notes.append(f"â€¢ High Loan Amount (>50L) observed in {high_loan} rejected cases.")
         else:

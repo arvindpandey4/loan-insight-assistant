@@ -27,6 +27,12 @@ from rag.vector_store import FAISSVectorStore
 from rag.langchain_Retriver import LoanEmbeddings, LoanFAISSVectorStore, LoanRAGRetriever
 from rag.llm_router import LLMRoutingAgent
 
+# Paths - adjusted for backend/ folder
+OUTPUT_DIR = Path(__file__).parent / "output"
+FAISS_INDEX_PATH = OUTPUT_DIR / "loan_faiss_index.bin"
+EMBEDDINGS_PATH = OUTPUT_DIR / "loan_embeddings.npy"
+CSV_PATH = OUTPUT_DIR / "processed_loan_data_with_embeddings.csv"
+
 def setup_system(groq_api_key: str = None):
     """
     Setup RAG system with Groq API routing
@@ -36,12 +42,10 @@ def setup_system(groq_api_key: str = None):
     groq_api_key : str, optional
         Groq API key. If None, reads from GROQ_API_KEY environment variable
     """
-    workspace_dir = Path(__file__).parent
-    output_dir = workspace_dir / 'output'
     
     print("[SETUP] Loading data...", flush=True)
-    df = pd.read_csv(output_dir / 'processed_loan_data_with_embeddings.csv')
-    embeddings = np.load(output_dir / 'loan_embeddings.npy')
+    df = pd.read_csv(CSV_PATH)
+    embeddings = np.load(EMBEDDINGS_PATH)
     
     # Store embeddings as column for similarity search
     df['embeddings'] = [embeddings[i] for i in range(len(df))]

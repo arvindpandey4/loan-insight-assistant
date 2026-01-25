@@ -5,9 +5,9 @@ import os
 load_dotenv()
 
 from fastapi import FastAPI
-from backend.services import router
-from backend.middleware import setup_middleware
-from backend.api import loan_api
+from services import router
+from middleware import setup_middleware
+from api import loan_api
 
 app = FastAPI(
     title="Loan Insight Assistant API",

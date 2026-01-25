@@ -13,7 +13,12 @@ class QueryUnderstandingAgent:
         self.api_key = api_key or os.getenv('GROQ_API_KEY')
         self.client = None
         if self.api_key:
-            self.client = Groq(api_key=self.api_key)
+            try:
+                # Groq 1.0.0+ initialization
+                self.client = Groq(api_key=self.api_key)
+            except Exception as e:
+                print(f"[ERROR] Failed to initialize Groq client: {e}")
+                self.client = None
         else:
             print("[WARN] Groq API Key missing. QueryUnderstandingAgent will fail.")
 

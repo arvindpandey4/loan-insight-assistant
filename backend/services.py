@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from .models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse
-from .api import loan_api
+from models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse
+from api import loan_api
 import shutil
 import os
 from pathlib import Path
@@ -38,6 +38,9 @@ async def query_insights(request: QueryRequest):
             structured_data=[case.model_dump() for case in (agent_response.structured_data or [])]
         )
     except Exception as e:
+        import traceback
+        print(f"[ERROR] Query processing failed:")
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error processing query: {str(e)}")
 
 @router.post("/upload-loan-data", response_model=UploadResponse)

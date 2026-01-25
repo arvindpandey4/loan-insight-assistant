@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export const fetchDashboardStats = async () => {
   try {
@@ -28,7 +28,7 @@ export const queryLoanInsights = async (question) => {
     }
 
     const data = await response.json();
-    
+
     // Transform backend response to frontend format if needed
     // Backend returns: { answer, risk_notes, evidence_points, ... }
     return {

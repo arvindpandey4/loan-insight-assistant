@@ -1,0 +1,35 @@
+# Loan Insight Assistant - Minimal Dependencies for Railway
+
+# Data manipulation (minimal versions)
+pandas==2.0.3
+numpy==1.24.3
+
+# CPU-only PyTorch (much smaller)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.0.1+cpu
+
+# Minimal sentence transformers
+sentence-transformers==2.2.2
+
+# LangChain (core only, minimal community)
+langchain-core==0.1.52
+langchain-community==0.0.38
+
+# Groq API for LLM (latest stable)
+groq==1.0.0
+
+# FAISS CPU-only
+faiss-cpu==1.7.4
+
+# Environment management
+python-dotenv==1.0.0
+
+# API Server (minimal versions)
+fastapi==0.103.0
+uvicorn[standard]==0.23.2
+python-multipart==0.0.6
+
+# Explicitly avoid heavy dependencies
+transformers==4.31.0
+tokenizers==0.13.3
+huggingface-hub==0.16.4
