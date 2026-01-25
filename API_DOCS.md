@@ -1,0 +1,564 @@
+# 📚 API Documentation - Loan Insight Assistant
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Base URL](#base-url)
+- [Authentication](#authentication)
+- [Endpoints](#endpoints)
+  - [Health Check](#health-check)
+  - [Dashboard Statistics](#dashboard-statistics)
+  - [Query Loan Insights](#query-loan-insights)
+  - [Upload Loan Data](#upload-loan-data)
+- [Data Models](#data-models)
+- [Error Handling](#error-handling)
+- [Rate Limiting](#rate-limiting)
+- [Examples](#examples)
+
+---
+
+## Overview
+
+The Loan Insight Assistant API provides RESTful endpoints for querying historical loan data using an intelligent RAG (Retrieval-Augmented Generation) system. The API is built with FastAPI and follows OpenAPI 3.0 specifications.
+
+### Key Features
+
+- **Type-Safe Responses**: All responses follow strict Pydantic schemas
+- **Automatic Documentation**: Interactive Swagger UI available at `/docs`
+- **CORS Enabled**: Cross-origin requests supported for frontend integration
+- **Error Handling**: Comprehensive error messages with appropriate HTTP status codes
+
+---
+
+## Base URL
+
+### Production
+```
+https://loaninsightassistantrag-production.up.railway.app
+```
+
+### Local Development
+```
+http://localhost:8000
+```
+
+### Interactive Documentation
+- **Swagger UI**: `{BASE_URL}/docs`
+- **ReDoc**: `{BASE_URL}/redoc`
+
+---
+
+## Authentication
+
+**Current Version**: No authentication required (public API)
+
+**Future Versions**: Will implement API key-based authentication
+
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+---
+
+## Endpoints
+
+### Health Check
+
+Check if the API is running and healthy.
+
+#### Request
+
+```http
+GET /health
+```
+
+#### Response
+
+**Status Code**: `200 OK`
+
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0"
+}
+```
+
+#### Example
+
+```bash
+curl https://loaninsightassistantrag-production.up.railway.app/health
+```
+
+---
+
+### Dashboard Statistics
+
+Retrieve aggregated statistics from the loan dataset.
+
+#### Request
+
+```http
+GET /dashboard-stats
+```
+
+#### Response
+
+**Status Code**: `200 OK`
+
+```json
+{
+  "total_loans": 1000,
+  "approval_rate": 68.5,
+  "avg_cibil": 742,
+  "avg_loan_amount": 2850000.50,
+  "loan_status_distribution": [
+    {
+      "name": "Approved",
+      "value": 685,
+      "color": "#10b981"
+    },
+    {
+      "name": "Rejected",
+      "value": 315,
+      "color": "#ef4444"
+    }
+  ],
+  "loan_type_distribution": [
+    {
+      "name": "Home Loan",
+      "value": 450,
+      "color": "#3b82f6"
+    },
+    {
+      "name": "Personal Loan",
+      "value": 350,
+      "color": "#10b981"
+    },
+    {
+      "name": "Business Loan",
+      "value": 200,
+      "color": "#f59e0b"
+    }
+  ],
+  "recent_applications": [
+    {
+      "id": "L001",
+      "applicant": "John Doe",
+      "amount": 3500000,
+      "status": "Approved",
+      "type": "Home Loan"
+    }
+  ]
+}
+```
+
+#### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `total_loans` | integer | Total number of loan records |
+| `approval_rate` | float | Percentage of approved loans |
+| `avg_cibil` | float | Average CIBIL score across all applicants |
+| `avg_loan_amount` | float | Average loan amount in INR |
+| `loan_status_distribution` | array | Breakdown by approval status |
+| `loan_type_distribution` | array | Breakdown by loan purpose |
+| `recent_applications` | array | Last 5 loan applications |
+
+#### Example
+
+```bash
+curl https://loaninsightassistantrag-production.up.railway.app/dashboard-stats
+```
+
+```javascript
+// JavaScript (Axios)
+const response = await axios.get('/dashboard-stats');
+console.log(response.data);
+```
+
+---
+
+### Query Loan Insights
+
+Submit a natural language query to the RAG system for intelligent loan insights.
+
+#### Request
+
+```http
+POST /query-loan-insights
+Content-Type: application/json
+```
+
+**Body**:
+
+```json
+{
+  "query": "Why are loans rejected for people with salary $40k to $80k a year?"
+}
+```
+
+#### Request Schema
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `query` | string | Yes | Natural language question about loan data |
+
+#### Response
+
+**Status Code**: `200 OK`
+
+```json
+{
+  "answer": "Based on 5 similar historical case(s), the approval rate is 40.0%. The candidates had an average CIBIL score of 680 and average income of INR 2,400,000. Most cases were rejected.",
+  "method_used": "Agentic RAG",
+  "intent": "WHY_REJECTED",
+  "evidence_points": [
+    "❌ Case: Rajesh Kumar (Rejected) - CIBIL: 650, Income: 2200000",
+    "❌ Case: Priya Sharma (Rejected) - CIBIL: 670, Income: 2500000",
+    "✅ Case: Amit Patel (Approved) - CIBIL: 750, Income: 2800000"
+  ],
+  "risk_notes": [
+    "Common factors in rejected cases:",
+    "• Low CIBIL Score (<750) observed in 3 rejected cases.",
+    "• High Debt-to-Income Ratio observed in 2 rejected cases."
+  ],
+  "compliance_disclaimer": "Generated by Case Analysis Engine (Fallback Mode). Verify with official records.",
+  "structured_data": [
+    {
+      "case_id": "145",
+      "customer_name": "Rajesh Kumar",
+      "loan_amount": 3500000,
+      "approval_status": "Rejected",
+      "similarity_score": 0.89,
+      "original_data": {
+        "CIBIL_Score": "650",
+        "Applicant_Income": "2200000",
+        "Debt_to_Income_Ratio": "0.45",
+        "Loan_Purpose": "Home Loan"
+      }
+    }
+  ]
+}
+```
+
+#### Response Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `answer` | string | Human-readable summary of findings |
+| `method_used` | string | Processing method (always "Agentic RAG") |
+| `intent` | string | Detected query intent (WHY_REJECTED, WHY_APPROVED, SIMILAR_CASES, RISK_ANALYSIS, GENERAL_INQUIRY) |
+| `evidence_points` | array[string] | Bullet points of supporting evidence |
+| `risk_notes` | array[string] | Identified risk factors and patterns |
+| `compliance_disclaimer` | string | Audit-friendly disclaimer |
+| `structured_data` | array[object] | Retrieved loan cases with full metadata |
+
+#### Intent Types
+
+| Intent | Description | Example Query |
+|--------|-------------|---------------|
+| `WHY_REJECTED` | Understanding rejection reasons | "Why was loan ID 123 rejected?" |
+| `WHY_APPROVED` | Understanding approval factors | "What led to approval of loan ID 456?" |
+| `SIMILAR_CASES` | Finding similar historical cases | "Show me similar cases to this applicant" |
+| `RISK_ANALYSIS` | Analyzing risk patterns | "What are common risk factors for rural applicants?" |
+| `GENERAL_INQUIRY` | General questions | "What is the average loan amount?" |
+
+#### Example Requests
+
+**cURL**:
+```bash
+curl -X POST https://loaninsightassistantrag-production.up.railway.app/query-loan-insights \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Why are loans rejected for people with salary $40k to $80k a year?"}'
+```
+
+**JavaScript (Axios)**:
+```javascript
+const response = await axios.post('/query-loan-insights', {
+  query: "Why are loans rejected for people with salary $40k to $80k a year?"
+});
+console.log(response.data.answer);
+```
+
+**Python (Requests)**:
+```python
+import requests
+
+response = requests.post(
+    "https://loaninsightassistantrag-production.up.railway.app/query-loan-insights",
+    json={"query": "Why are loans rejected for people with salary $40k to $80k a year?"}
+)
+print(response.json()["answer"])
+```
+
+#### Error Responses
+
+**400 Bad Request** - Invalid query format
+```json
+{
+  "detail": "Query text is required"
+}
+```
+
+**500 Internal Server Error** - Processing error
+```json
+{
+  "detail": "Error processing query: <error_message>"
+}
+```
+
+---
+
+### Upload Loan Data
+
+Upload a CSV file containing new loan data for processing.
+
+#### Request
+
+```http
+POST /upload-loan-data
+Content-Type: multipart/form-data
+```
+
+**Form Data**:
+- `file`: CSV file (required)
+
+#### Response
+
+**Status Code**: `200 OK`
+
+```json
+{
+  "message": "File uploaded and processed successfully",
+  "filename": "new_loans.csv",
+  "records_processed": 150
+}
+```
+
+#### CSV Format Requirements
+
+The CSV must contain the following columns:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `Loan_ID` | string | Unique loan identifier |
+| `Customer_Name` | string | Applicant name |
+| `Loan_Amount` | float | Loan amount in INR |
+| `Applicant_Income` | float | Annual income in INR |
+| `CIBIL_Score` | integer | Credit score (300-900) |
+| `Loan_Status` | string | "Approved" or "Rejected" |
+| `Purpose_of_Loan` | string | Loan purpose/type |
+| `Debt_to_Income_Ratio` | float | DTI ratio (0-1) |
+
+#### Example
+
+**cURL**:
+```bash
+curl -X POST https://loaninsightassistantrag-production.up.railway.app/upload-loan-data \
+  -F "file=@new_loans.csv"
+```
+
+**JavaScript (FormData)**:
+```javascript
+const formData = new FormData();
+formData.append('file', fileInput.files[0]);
+
+const response = await axios.post('/upload-loan-data', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
+```
+
+#### Error Responses
+
+**400 Bad Request** - Invalid file format
+```json
+{
+  "detail": "Only CSV files are supported"
+}
+```
+
+**500 Internal Server Error** - Processing error
+```json
+{
+  "detail": "Error uploading file: <error_message>"
+}
+```
+
+---
+
+## Data Models
+
+### QueryRequest
+
+```typescript
+{
+  query: string  // Natural language question
+}
+```
+
+### QueryResponse
+
+```typescript
+{
+  answer: string
+  method_used: string
+  intent: string
+  evidence_points: string[]
+  risk_notes: string[]
+  compliance_disclaimer: string
+  structured_data: RetrievedLoanCase[]
+}
+```
+
+### RetrievedLoanCase
+
+```typescript
+{
+  case_id: string
+  customer_name: string
+  loan_amount: number
+  approval_status: string
+  similarity_score: number
+  original_data: {
+    [key: string]: any
+  }
+}
+```
+
+### DashboardStatsResponse
+
+```typescript
+{
+  total_loans: number
+  approval_rate: number
+  avg_cibil: number
+  avg_loan_amount: number
+  loan_status_distribution: Array<{
+    name: string
+    value: number
+    color: string
+  }>
+  loan_type_distribution: Array<{
+    name: string
+    value: number
+    color: string
+  }>
+  recent_applications: Array<{
+    id: string
+    applicant: string
+    amount: number
+    status: string
+    type: string
+  }>
+}
+```
+
+---
+
+## Error Handling
+
+### Standard Error Response
+
+```json
+{
+  "detail": "Error message describing what went wrong"
+}
+```
+
+### HTTP Status Codes
+
+| Code | Meaning | When It Occurs |
+|------|---------|----------------|
+| `200` | OK | Request successful |
+| `400` | Bad Request | Invalid input data |
+| `404` | Not Found | Endpoint doesn't exist |
+| `500` | Internal Server Error | Server-side processing error |
+
+---
+
+## Rate Limiting
+
+**Current Version**: No rate limiting
+
+**Future Versions**: 
+- 100 requests per minute per IP
+- 1000 requests per day per API key
+
+---
+
+## Examples
+
+### Complete Workflow Example
+
+```javascript
+// 1. Check API health
+const health = await axios.get('/health');
+console.log('API Status:', health.data.status);
+
+// 2. Get dashboard stats
+const stats = await axios.get('/dashboard-stats');
+console.log('Total Loans:', stats.data.total_loans);
+
+// 3. Query insights
+const insights = await axios.post('/query-loan-insights', {
+  query: "What are the main reasons for loan rejection?"
+});
+console.log('Answer:', insights.data.answer);
+console.log('Evidence:', insights.data.evidence_points);
+
+// 4. Upload new data
+const formData = new FormData();
+formData.append('file', csvFile);
+const upload = await axios.post('/upload-loan-data', formData);
+console.log('Processed:', upload.data.records_processed, 'records');
+```
+
+### Sample Queries
+
+**Risk Analysis**:
+```json
+{
+  "query": "What are the primary risk factors for applicants in Rural areas?"
+}
+```
+
+**Similar Cases**:
+```json
+{
+  "query": "Find similar approved applications for a 3,000,000 INR loan with good credit"
+}
+```
+
+**Specific Case**:
+```json
+{
+  "query": "Why was loan ID 10 rejected?"
+}
+```
+
+**Compliance Query**:
+```json
+{
+  "query": "Show me audit trail for high-value loan approvals"
+}
+```
+
+---
+
+## Support
+
+For API issues or questions:
+- **GitHub Issues**: [Open an issue](https://github.com/BL-Diptanshu/Loan_Insight_Assistant_RAG/issues)
+- **Documentation**: [README.md](README.md)
+- **Interactive Docs**: https://loaninsightassistantrag-production.up.railway.app/docs
+
+---
+
+<div align="center">
+
+**API Version**: 1.0.0  
+**Last Updated**: January 2026
+
+[⬆ Back to Top](#-api-documentation---loan-insight-assistant)
+
+</div>
