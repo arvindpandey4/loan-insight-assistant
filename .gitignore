@@ -97,3 +97,15 @@ pip-delete-this-directory.txt
 
 # Vercel
 .vercel
+
+# Project-specific
+output/
+/*.xlsx
+/*.csv
+/search_loans.py
+
+# Root-level redundant files
+/rag/
+/requirements.txt
+/__pycache__/
+/.pytest_cache/
