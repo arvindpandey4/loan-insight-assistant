@@ -27,3 +27,12 @@ class UploadResponse(BaseModel):
     filename: str
     records_processed: int
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+class LoanStatusDistributionResponse(BaseModel):
+    distribution: Dict[str, int] = Field(..., example={"Approved": 100, "Rejected": 20})
+
+class AverageCIBILResponse(BaseModel):
+    average_scores: Dict[str, float] = Field(..., example={"Approved": 750.5, "Rejected": 600.0})
+
+class RejectionPurposeResponse(BaseModel):
+    rejections_by_purpose: Dict[str, int] = Field(..., example={"Home Loan": 15, "Personal Loan": 5})
