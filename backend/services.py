@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse
-from api import loan_api
+from .models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse, LoanStatusDistributionResponse, AverageCIBILResponse, RejectionPurposeResponse
+from .api import loan_api
+from .analytics import analytics_service
 import shutil
 import os
 from pathlib import Path
@@ -66,3 +67,27 @@ async def upload_data(file: UploadFile = File(...)):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
+
+@router.get("/analytics/loan-status", response_model=LoanStatusDistributionResponse)
+async def get_loan_status_analytics():
+    try:
+        data = analytics_service.get_loan_status_distribution()
+        return LoanStatusDistributionResponse(distribution=data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching loan status analytics: {str(e)}")
+
+@router.get("/analytics/cibil-by-status", response_model=AverageCIBILResponse)
+async def get_cibil_analytics():
+    try:
+        data = analytics_service.get_avg_cibil_by_status()
+        return AverageCIBILResponse(average_scores=data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching CIBIL analytics: {str(e)}")
+
+@router.get("/analytics/rejections-by-purpose", response_model=RejectionPurposeResponse)
+async def get_rejection_analytics():
+    try:
+        data = analytics_service.get_rejections_by_purpose()
+        return RejectionPurposeResponse(rejections_by_purpose=data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching rejection analytics: {str(e)}")
