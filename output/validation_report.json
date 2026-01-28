@@ -1,0 +1,21 @@
+{
+  "total_records": 1000,
+  "total_columns": 47,
+  "total_texts": 1000,
+  "avg_text_length": 580,
+  "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+  "total_embeddings": 1000,
+  "embedding_dimension": 384,
+  "normalized": true,
+  "batch_size": 32,
+  "index_type": "IndexFlatIP",
+  "dimension": 384,
+  "total_vectors": 1000,
+  "metric": "cosine_similarity",
+  "timestamp": "2026-01-23 13:00:46",
+  "artifacts": {
+    "processed_csv": "output\\processed_loan_data_with_embeddings.csv",
+    "faiss_index": "output\\loan_faiss_index.bin",
+    "embeddings": "output\\loan_embeddings.npy"
+  }
+}

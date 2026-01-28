@@ -1,31 +1,44 @@
-# Environment Variables (REQUIRED - never commit API keys)
+# Environment Variables
 .env
 .env.local
 
-# Python Cache (REQUIRED - generated files)
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Python Cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.py[cod]
+*$py.class
 .Python
 
-# Virtual Environment (REQUIRED - local only)
+# Virtual Environment
 venv/
 env/
 .venv
 
-# IDE Files (REQUIRED - local preference)
+# IDE Files
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS Files (REQUIRED - system generated)
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS Files
 .DS_Store
 Thumbs.db
 
-# Large Data Files (OPTIONAL - keep code, ignore data)
+# Large Data Files
 *.xlsx
 output/*.npy
 output/*.csv
-

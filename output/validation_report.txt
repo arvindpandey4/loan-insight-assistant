@@ -1,0 +1,38 @@
+================================================================================
+LOAN INSIGHT ASSISTANT - PIPELINE EXECUTION REPORT
+================================================================================
+
+Generated: 2026-01-23 13:00:46
+
+1. DATA OVERVIEW
+--------------------------------------------------------------------------------
+Total Records: 1000
+Total Columns: 47
+Data Quality: N/A
+
+2. TEXT PROCESSING
+--------------------------------------------------------------------------------
+Total Texts: 1000
+Average Length: 580 chars
+
+3. EMBEDDINGS
+--------------------------------------------------------------------------------
+Model: sentence-transformers/all-MiniLM-L6-v2
+Dimension: 384
+Total Embeddings: 1000
+
+4. VECTOR STORE
+--------------------------------------------------------------------------------
+Index Type: IndexFlatIP
+Total Vectors: 1000
+Metric: cosine_similarity
+
+5. OUTPUT ARTIFACTS
+--------------------------------------------------------------------------------
+processed_csv: output\processed_loan_data_with_embeddings.csv
+faiss_index: output\loan_faiss_index.bin
+embeddings: output\loan_embeddings.npy
+
+================================================================================
+END OF REPORT
+================================================================================
