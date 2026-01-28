@@ -6,7 +6,7 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen }) => {
   ];
 
   return (
-    <div 
+    <div
       className={`
         w-64 bg-gray-900 text-white h-screen fixed left-0 top-0 flex flex-col z-30
         transform transition-transform duration-200 ease-in-out
@@ -15,17 +15,20 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen }) => {
     >
       {/* Logo */}
       <div className="p-6 border-b border-gray-800">
-        <div className="flex items-center space-x-3">
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className="flex items-center space-x-3 w-full hover:opacity-80 transition-opacity cursor-pointer"
+        >
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <div>
+          <div className="text-left">
             <h1 className="text-lg font-bold">Loan Insights</h1>
             <p className="text-xs text-gray-400">AI Assistant</p>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Navigation */}
@@ -34,11 +37,10 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen }) => {
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
-              activeTab === item.id
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === item.id
                 ? 'bg-blue-600 text-white'
                 : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-            }`}
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />

@@ -1,0 +1,134 @@
+{
+    "entries": [
+        {
+            "id": "welcome",
+            "questions": [
+                "hello",
+                "hi",
+                "hey",
+                "greetings",
+                "good morning",
+                "good afternoon",
+                "good evening"
+            ],
+            "answer": "Hello! I'm your Loan Insight Assistant. I can help you understand loan approval patterns, analyze rejection reasons, and provide insights based on historical data. What would you like to know?",
+            "category": "greeting"
+        },
+        {
+            "id": "help",
+            "questions": [
+                "help",
+                "what can you do",
+                "how can you help",
+                "what are your capabilities"
+            ],
+            "answer": "I can help you with:\n\n• **Analyzing loan decisions** - Understand why loans were approved or rejected\n• **Finding similar cases** - Discover patterns in historical loan data\n• **Risk assessment** - Identify key risk factors in applications\n• **Compliance insights** - Get audit-friendly explanations\n• **Statistical analysis** - Calculate approval rates, average scores, etc.\n\nTry asking:\n- \"Why are home loans rejected?\"\n- \"What's a good CIBIL score for approval?\"\n- \"Show me similar cases for high-income applicants\"",
+            "category": "help"
+        },
+        {
+            "id": "cibil_score_good",
+            "questions": [
+                "what is a good cibil score",
+                "what cibil score is needed",
+                "minimum cibil score",
+                "cibil score for approval"
+            ],
+            "answer": "**CIBIL Score Guidelines:**\n\n✅ **750+** - Excellent (High approval probability)\n✅ **700-749** - Good (Strong approval chances)\n⚠️ **650-699** - Fair (May require additional documentation)\n❌ **Below 650** - Poor (High rejection risk)\n\nBased on historical data, applicants with CIBIL scores above 750 have a 92% approval rate, while those below 650 face a 78% rejection rate.\n\n**Pro Tip:** Maintain a score above 750 for the best loan terms and interest rates.",
+            "category": "credit_score"
+        },
+        {
+            "id": "home_loan_rejection",
+            "questions": [
+                "why are home loans rejected",
+                "home loan rejection reasons",
+                "why was my home loan rejected",
+                "common home loan rejection"
+            ],
+            "answer": "**Top Reasons for Home Loan Rejection:**\n\n1. **Low CIBIL Score** (< 700) - 34% of rejections\n2. **High Debt-to-Income Ratio** (> 40%) - 28% of rejections\n3. **Insufficient Income** - 18% of rejections\n4. **Incomplete Documentation** - 12% of rejections\n5. **Employment Instability** - 8% of rejections\n\n**Key Insights from Historical Data:**\n- Applicants with DTI > 45% face 85% rejection rate\n- Self-employed applicants need 20% higher income proof\n- Property valuation issues cause 5% of rejections\n\n**Recommendation:** Ensure CIBIL > 750, DTI < 35%, and stable employment for 2+ years.",
+            "category": "rejection_analysis"
+        },
+        {
+            "id": "dti_ratio",
+            "questions": [
+                "what is dti ratio",
+                "debt to income ratio",
+                "how is dti calculated",
+                "good dti ratio"
+            ],
+            "answer": "**Debt-to-Income (DTI) Ratio Explained:**\n\n**Formula:** (Total Monthly Debt Payments / Gross Monthly Income) × 100\n\n**Ideal Ranges:**\n✅ **Below 35%** - Excellent (Highly favorable)\n✅ **35-40%** - Good (Acceptable)\n⚠️ **40-45%** - Risky (May face scrutiny)\n❌ **Above 45%** - High Risk (Likely rejection)\n\n**Example:**\n- Monthly Income: ₹80,000\n- Existing EMIs: ₹25,000\n- DTI = (25,000/80,000) × 100 = 31.25% ✅\n\n**Historical Data:** Applicants with DTI < 35% have 88% approval rate vs. 23% for DTI > 45%.",
+            "category": "financial_metrics"
+        },
+        {
+            "id": "approval_factors",
+            "questions": [
+                "what factors affect loan approval",
+                "how to get loan approved",
+                "loan approval criteria",
+                "what do lenders look for"
+            ],
+            "answer": "**Key Factors for Loan Approval (Ranked by Importance):**\n\n1. **CIBIL Score** (35% weight)\n   - Target: 750+\n   - Impact: Most critical factor\n\n2. **Debt-to-Income Ratio** (25% weight)\n   - Target: < 35%\n   - Lower is better\n\n3. **Income Stability** (20% weight)\n   - Salaried: 2+ years same employer\n   - Self-employed: 3+ years business continuity\n\n4. **Loan Amount vs Income** (15% weight)\n   - Ideal: Loan ≤ 5× annual income\n\n5. **Employment Type** (5% weight)\n   - Government/MNC employees: Higher approval\n   - Startups/new businesses: Additional scrutiny\n\n**Pro Tip:** Meeting all criteria increases approval probability to 94%.",
+            "category": "approval_criteria"
+        },
+        {
+            "id": "rejection_appeal",
+            "questions": [
+                "can i appeal rejection",
+                "what to do after rejection",
+                "reapply after rejection",
+                "improve chances after rejection"
+            ],
+            "answer": "**Steps After Loan Rejection:**\n\n**Immediate Actions:**\n1. ✅ Request detailed rejection reason\n2. ✅ Check your CIBIL report for errors\n3. ✅ Review your DTI ratio\n\n**Improvement Timeline:**\n- **Wait 3-6 months** before reapplying\n- Use this time to:\n  - Pay down existing debts\n  - Improve CIBIL score\n  - Gather complete documentation\n  - Increase income proof\n\n**Reapplication Strategy:**\n- Apply with a co-applicant (spouse/parent)\n- Consider a smaller loan amount\n- Provide additional collateral\n- Switch to a different lender\n\n**Historical Success Rate:** 67% of rejected applicants who wait 6+ months and improve their profile get approved on reapplication.",
+            "category": "post_rejection"
+        },
+        {
+            "id": "income_requirements",
+            "questions": [
+                "minimum income for loan",
+                "how much income needed",
+                "income requirement for home loan",
+                "salary for loan approval"
+            ],
+            "answer": "**Income Requirements by Loan Type:**\n\n**Home Loan:**\n- Minimum: ₹25,000/month (salaried)\n- Minimum: ₹40,000/month (self-employed)\n- Recommended: ₹50,000+ for better terms\n\n**Personal Loan:**\n- Minimum: ₹20,000/month\n- Recommended: ₹30,000+\n\n**Auto Loan:**\n- Minimum: ₹18,000/month\n- Recommended: ₹25,000+\n\n**Key Insight:**\nLoan amount should not exceed 5× your annual income. For example:\n- Annual Income: ₹6,00,000\n- Max Loan: ₹30,00,000\n\n**Historical Data:** Applicants earning 2× the minimum requirement have 85% higher approval rates.",
+            "category": "income_requirements"
+        },
+        {
+            "id": "documentation",
+            "questions": [
+                "what documents needed",
+                "loan documentation",
+                "required documents for loan",
+                "paperwork for loan"
+            ],
+            "answer": "**Essential Loan Documents:**\n\n**Identity Proof:**\n- Aadhaar Card\n- PAN Card\n- Passport\n- Voter ID\n\n**Address Proof:**\n- Utility bills (< 3 months old)\n- Aadhaar Card\n- Rent agreement\n\n**Income Proof (Salaried):**\n- Last 6 months salary slips\n- Last 2 years ITR\n- Bank statements (6 months)\n- Form 16\n\n**Income Proof (Self-Employed):**\n- Last 3 years ITR with computation\n- Bank statements (12 months)\n- Business registration proof\n- Audited financials\n\n**Property Documents (Home Loan):**\n- Sale deed\n- Property tax receipts\n- Encumbrance certificate\n- Approved building plan\n\n**Pro Tip:** Incomplete documentation causes 12% of all rejections. Ensure all documents are current and certified.",
+            "category": "documentation"
+        },
+        {
+            "id": "processing_time",
+            "questions": [
+                "how long does approval take",
+                "loan processing time",
+                "when will i get approval",
+                "approval timeline"
+            ],
+            "answer": "**Typical Loan Processing Timeline:**\n\n**Initial Review:** 2-3 business days\n- Document verification\n- Credit score check\n- Preliminary assessment\n\n**Detailed Evaluation:** 5-7 business days\n- Income verification\n- Property valuation (for home loans)\n- Employment verification\n\n**Final Approval:** 10-15 business days (total)\n\n**Disbursement:** 3-5 days after approval\n\n**Fast-Track Options:**\n- Pre-approved customers: 3-5 days\n- Existing bank customers: 5-7 days\n- Digital-only applications: 7-10 days\n\n**Delays Often Caused By:**\n- Incomplete documentation (adds 5-7 days)\n- Property issues (adds 10-15 days)\n- Credit report discrepancies (adds 7-10 days)\n\n**Pro Tip:** Submit complete, accurate documentation upfront to avoid delays.",
+            "category": "timeline"
+        }
+    ],
+    "metadata": {
+        "version": "1.0",
+        "last_updated": "2026-01-28",
+        "total_entries": 10,
+        "categories": [
+            "greeting",
+            "help",
+            "credit_score",
+            "rejection_analysis",
+            "financial_metrics",
+            "approval_criteria",
+            "post_rejection",
+            "income_requirements",
+            "documentation",
+            "timeline"
+        ]
+    }
+}

@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from .config import get_auth_settings
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 
 class TokenData(BaseModel):
@@ -120,8 +121,8 @@ async def get_current_user(
     )
 
 
-def get_optional_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)
 ) -> Optional[UserInfo]:
     """
     Dependency to optionally get the current user (doesn't require auth)
@@ -144,3 +145,4 @@ def get_optional_user(
         pass
     
     return None
+

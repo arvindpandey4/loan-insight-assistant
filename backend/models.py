@@ -4,6 +4,7 @@ from datetime import datetime
 
 class QueryRequest(BaseModel):
     query: str = Field(..., example="What is the average loan amount?")
+    conversation_history: Optional[List[Dict[str, str]]] = Field(default=None, description="Previous messages for context")
 
 class QueryResponse(BaseModel):
     answer: str
@@ -14,6 +15,7 @@ class QueryResponse(BaseModel):
     risk_notes: List[str] = Field(default_factory=list)
     compliance_disclaimer: Optional[str] = None
     structured_data: Optional[List[Dict[str, Any]]] = None
+    source: Optional[str] = Field(default="rag", description="Source: 'golden_kb' or 'rag'")
     
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 

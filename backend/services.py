@@ -1,7 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from typing import Optional
 from .models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse, LoanStatusDistributionResponse, AverageCIBILResponse, RejectionPurposeResponse
 from .api import loan_api
 from .analytics import analytics_service
+from .auth.jwt_handler import get_current_user_optional, UserInfo
+from .database import UserRepository, HistoryRepository
+from .database.history_schema import HistoryEntryCreate, QueryType
 import shutil
 import os
 from pathlib import Path
@@ -21,23 +25,55 @@ async def get_dashboard_stats():
         raise HTTPException(status_code=500, detail=f"Error fetching dashboard stats: {str(e)}")
 
 @router.post("/query-loan-insights", response_model=QueryResponse)
-async def query_insights(request: QueryRequest):
+async def query_insights(
+    request: QueryRequest,
+    current_user: Optional[UserInfo] = Depends(get_current_user_optional)
+):
     try:
-        agent_response = loan_api.get_insights(request.query)
+        # Pass conversation history to the orchestrator
+        agent_response = loan_api.get_insights(
+            request.query,
+            conversation_context=request.conversation_history
+        )
         
         # convert agent response (FinalResponseSchema) to API response (QueryResponse)
         # we dump the Pydantic model to a dict to easily map fields
         response_data = agent_response.model_dump()
         
-        return QueryResponse(
+        query_response = QueryResponse(
             answer=agent_response.summary,
-            method_used="Agentic RAG",
+            method_used="Agentic RAG with Golden KB",
             intent=agent_response.intent,
             evidence_points=agent_response.evidence_points,
             risk_notes=agent_response.risk_notes,
             compliance_disclaimer=agent_response.compliance_disclaimer,
-            structured_data=[case.model_dump() for case in (agent_response.structured_data or [])]
+            structured_data=[case.model_dump() for case in (agent_response.structured_data or [])],
+            source=agent_response.source
         )
+        
+        # Save to history if user is authenticated
+        if current_user:
+            try:
+                user = await UserRepository.get_user_by_email(current_user.email)
+                if user:
+                    await HistoryRepository.create_entry(
+                        HistoryEntryCreate(
+                            user_id=user.id,
+                            query=request.query,
+                            response=agent_response.summary,
+                            query_type=QueryType.LOAN_ANALYSIS,
+                            metadata={
+                                "intent": agent_response.intent.value,
+                                "case_count": agent_response.retrieved_case_count,
+                                "source": agent_response.source
+                            }
+                        )
+                    )
+            except Exception as hist_err:
+                # Don't fail the request if history save fails
+                print(f"[WARN] Failed to save history: {hist_err}")
+        
+        return query_response
     except Exception as e:
         import traceback
         print(f"[ERROR] Query processing failed:")

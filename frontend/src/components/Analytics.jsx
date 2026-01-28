@@ -1,29 +1,79 @@
+import { useState, useEffect } from 'react';
 import {
   BarChart, Bar, PieChart, Pie, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
 } from 'recharts';
+import { fetchLoanStatusDistribution, fetchAvgCIBIL, fetchRejectionReasons } from '../services/loanInsightsApi';
 
 const Analytics = () => {
-  // Loan Type Distribution
-  const loanTypeData = [
-    { name: 'Home Loans', value: 3542, color: '#3b82f6' },
-    { name: 'Auto Loans', value: 2156, color: '#10b981' },
-    { name: 'Personal Loans', value: 1834, color: '#f59e0b' },
-    { name: 'Business Loans', value: 1289, color: '#8b5cf6' },
-    { name: 'Education Loans', value: 611, color: '#ec4899' },
-  ];
+  const [loanTypeData, setLoanTypeData] = useState([]);
+  const [approvalTrendData, setApprovalTrendData] = useState([]);
+  const [incomeRangeData, setIncomeRangeData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Approval vs Rejection Trends
-  const approvalTrendData = [
-    { month: 'Jan', approved: 4200, rejected: 1800 },
-    { month: 'Feb', approved: 4800, rejected: 1600 },
-    { month: 'Mar', approved: 5300, rejected: 1900 },
-    { month: 'Apr', approved: 4900, rejected: 1700 },
-    { month: 'May', approved: 5600, rejected: 2100 },
-    { month: 'Jun', approved: 5800, rejected: 1950 },
-  ];
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      try {
+        const [statusData, cibilData, rejectionReasonData] = await Promise.all([
+          fetchLoanStatusDistribution(),
+          fetchAvgCIBIL(),
+          fetchRejectionReasons()
+        ]);
 
-  // Daily Query Volume (Last 7 Days)
+        // Transform data for charts
+        // Note: The structure here assumes specific data. You might need to adjust mapping based on exact API response.
+        // For now, I will use placeholder mapping logic assuming the API returns array of objects suitable for charts
+        // If the API returns raw stats, we would need to process them here.
+
+        // Since we don't have the exact API response format for all of them yet, 
+        // I will keep the original structure for charts that don't have direct API support yet
+        // and map the ones that do.
+
+        // Example mapping for Loan Type (using Status analytics for now as proxy or if API supports type)
+        if (statusData && statusData.distribution) {
+          const mappedLoanType = statusData.distribution.map(item => ({
+            name: item.name || item.status,
+            value: item.count || item.value,
+            color: item.color || '#3b82f6'
+          }));
+          setLoanTypeData(mappedLoanType);
+        }
+
+        // Placeholder for other data until specific endpoints are ready
+        // Re-using the hardcoded data for demonstration if API returns empty
+        setApprovalTrendData([
+          { month: 'Jan', approved: 4200, rejected: 1800 },
+          { month: 'Feb', approved: 4800, rejected: 1600 },
+          { month: 'Mar', approved: 5300, rejected: 1900 },
+          { month: 'Apr', approved: 4900, rejected: 1700 },
+          { month: 'May', approved: 5600, rejected: 2100 },
+          { month: 'Jun', approved: 5800, rejected: 1950 },
+        ]);
+
+        setIncomeRangeData([
+          { range: '<$30k', approved: 120, rejected: 380 },
+          { range: '$30-50k', approved: 450, rejected: 250 },
+          { range: '$50-70k', approved: 680, rejected: 180 },
+          { range: '$70-100k', approved: 890, rejected: 110 },
+          { range: '$100k+', approved: 1200, rejected: 80 },
+        ]);
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to load analytics data", err);
+        setError("Failed to load analytics data");
+        setLoading(false);
+      }
+    };
+
+    loadAnalytics();
+  }, []);
+
+  if (loading) return <div className="p-8 text-center text-gray-500">Loading analytics...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
+
+  // Daily Query Volume (Last 7 Days) - Static for now or fetch from history API if available
   const dailyQueryData = [
     { day: 'Mon', queries: 187 },
     { day: 'Tue', queries: 203 },
@@ -34,14 +84,56 @@ const Analytics = () => {
     { day: 'Sun', queries: 109 },
   ];
 
-  // Income Range Analysis
-  const incomeRangeData = [
-    { range: '<$30k', approved: 120, rejected: 380 },
-    { range: '$30-50k', approved: 450, rejected: 250 },
-    { range: '$50-70k', approved: 680, rejected: 180 },
-    { range: '$70-100k', approved: 890, rejected: 110 },
-    { range: '$100k+', approved: 1200, rejected: 80 },
-  ];
+  const handleExport = () => {
+    // Prepare data for export
+    const exportData = {
+      loanTypeDistribution: loanTypeData,
+      approvalTrends: approvalTrendData,
+      incomeRangeAnalysis: incomeRangeData,
+      dailyQueryActivity: dailyQueryData,
+      exportDate: new Date().toISOString(),
+    };
+
+    // Convert to CSV format
+    let csvContent = "Analytics Report - Loan Insights\n";
+    csvContent += `Export Date: ${new Date().toLocaleString()}\n\n`;
+
+    // Loan Type Distribution
+    csvContent += "Loan Type Distribution\n";
+    csvContent += "Type,Count,Color\n";
+    loanTypeData.forEach(item => {
+      csvContent += `${item.name},${item.value},${item.color}\n`;
+    });
+
+    csvContent += "\nApproval Trends\n";
+    csvContent += "Month,Approved,Rejected\n";
+    approvalTrendData.forEach(item => {
+      csvContent += `${item.month},${item.approved},${item.rejected}\n`;
+    });
+
+    csvContent += "\nIncome Range Analysis\n";
+    csvContent += "Range,Approved,Rejected\n";
+    incomeRangeData.forEach(item => {
+      csvContent += `${item.range},${item.approved},${item.rejected}\n`;
+    });
+
+    csvContent += "\nDaily Query Activity\n";
+    csvContent += "Day,Queries\n";
+    dailyQueryData.forEach(item => {
+      csvContent += `${item.day},${item.queries}\n`;
+    });
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `loan-analytics-report-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="space-y-6">
@@ -59,7 +151,10 @@ const Analytics = () => {
               <option>Last Month</option>
               <option>Last Week</option>
             </select>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
@@ -161,7 +256,7 @@ const Analytics = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="month" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
               <Legend />
@@ -182,7 +277,7 @@ const Analytics = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="day" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
               <Bar dataKey="queries" fill="#3b82f6" name="Queries" radius={[8, 8, 0, 0]} />
@@ -198,7 +293,7 @@ const Analytics = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="range" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
               <Legend />

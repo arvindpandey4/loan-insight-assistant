@@ -9,6 +9,7 @@ from services import router
 from middleware import setup_middleware
 from api import loan_api
 from auth.google_oauth import router as auth_router
+from history_routes import router as history_router
 from database.connection import connect_to_mongo, close_mongo_connection
 
 app = FastAPI(
@@ -23,6 +24,7 @@ setup_middleware(app)
 #api routes
 app.include_router(router)
 app.include_router(auth_router)
+app.include_router(history_router)
 
 @app.on_event("startup")
 async def startup_event():

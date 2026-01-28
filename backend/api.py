@@ -11,7 +11,18 @@ from typing import Tuple, Dict, Any, List
 # the project root is effectively the directory containing this file.
 
 project_root = str(Path(__file__).parent)
+parent_root = str(Path(__file__).parent.parent)
+
+# Add parent directory (project root) first
+if parent_root not in sys.path:
+    sys.path.insert(0, parent_root)
+
+# Add backend directory LAST (so it is at index 0)
 if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+else:
+    # If already in path, move to front
+    sys.path.remove(project_root)
     sys.path.insert(0, project_root)
 
 from agent_system.schemas import UserQueryInput
@@ -37,15 +48,16 @@ class LoanInsightAPI:
             print(f"[ERROR] Failed to initialize LoanInsightAPI: {str(e)}")
             raise e
 
-    def get_insights(self, query: str) -> Tuple[str, str]:
-        """Process a query and return insights"""
+    def get_insights(self, query: str, conversation_context: List[Dict[str, str]] = None):
+        """Process a query and return insights with conversation support"""
         if not self.is_initialized:
             self.initialize()
         
         
-        #use the orchestrator pipeline
+        #use the orchestrator pipeline with conversation context
         response_schema = self.orchestrator.pydantic_ai_pipeline(
-            UserQueryInput(query_text=query)
+            UserQueryInput(query_text=query),
+            conversation_context=conversation_context
         )
         
         return response_schema

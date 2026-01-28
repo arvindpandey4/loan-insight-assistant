@@ -11,6 +11,7 @@ class IntentType(str, Enum):
     RISK_ANALYSIS = "risk_analysis"
     AUDIT_REASON = "audit_reason"
     GENERAL_INQUIRY = "general_inquiry"
+    GENERAL = "general"
 
 class RiskFlag(str, Enum):
     HIGH_DTI = "high_dti"
@@ -58,3 +59,5 @@ class FinalResponseSchema(BaseModel):
     risk_notes: List[str] = Field(default_factory=list, description="Risk factors identified")
     compliance_disclaimer: str
     structured_data: Optional[List[RetrievedLoanCaseSchema]] = None
+    source: Optional[str] = Field(default="rag", description="Source of answer: 'golden_kb' or 'rag'")
+
