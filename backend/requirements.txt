@@ -34,3 +34,11 @@ httpx==0.24.1  # Pin for TestClient compatibility
 transformers==4.31.0
 tokenizers==0.13.3
 huggingface-hub==0.16.4
+
+# Database
+motor==3.3.1
+pymongo==4.5.0
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
