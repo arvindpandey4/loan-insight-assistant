@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
     // Check for token in URL (OAuth callback)
     const urlParams = new URLSearchParams(window.location.search);
     const urlToken = urlParams.get('token');
-    
+
     if (urlToken) {
       localStorage.setItem('token', urlToken);
       setToken(urlToken);
@@ -27,14 +27,16 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
   const fetchUserInfo = async (authToken) => {
     try {
-      const response = await fetch('http://localhost:8000/auth/me', {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${authToken}`
         }
       });
-      
+
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
@@ -52,7 +54,7 @@ export function AuthProvider({ children }) {
 
   const login = () => {
     // Redirect to backend Google OAuth
-    window.location.href = 'http://localhost:8000/auth/google/login';
+    window.location.href = `${API_BASE_URL}/auth/google/login`;
   };
 
   const logout = () => {
