@@ -22,11 +22,17 @@ export const queryLoanInsights = async (question, conversationHistory = null) =>
       requestBody.conversation_history = conversationHistory;
     }
 
+    const token = localStorage.getItem('token');
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}/query-loan-insights`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers,
       body: JSON.stringify(requestBody),
     });
 

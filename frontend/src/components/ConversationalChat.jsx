@@ -6,69 +6,71 @@ const ChatMessage = ({ message, isUser }) => {
 
     return (
         <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-fadeIn`}>
-            <div className={`flex ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start max-w-3xl`}>
+            {/* Message Bubble Container */}
+            <div className={`group flex ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end max-w-[85%] lg:max-w-[70%]`}>
+
                 {/* Avatar */}
-                <div className={`flex-shrink-0 ${isUser ? 'ml-3' : 'mr-3'}`}>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isUser ? 'bg-blue-600' : isGoldenKB ? 'bg-gradient-to-br from-yellow-400 to-orange-500' : 'bg-gradient-to-br from-purple-600 to-blue-600'
-                        }`}>
-                        {isUser ? (
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        ) : isGoldenKB ? (
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                            </svg>
-                        ) : (
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                        )}
+                <div className={`flex-shrink-0 mb-1 ${isUser ? 'hidden' : 'mr-3'}`}>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-md">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
                     </div>
                 </div>
 
-                {/* Message Content */}
-                <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
-                    <div className={`rounded-2xl px-5 py-3 shadow-md ${isUser
-                            ? 'bg-blue-600 text-white'
+                {/* Bubble */}
+                <div
+                    className={`relative px-5 py-3.5 shadow-sm text-sm md:text-[15px] leading-relaxed 
+                    ${isUser
+                            ? 'bg-blue-600 text-white rounded-2xl rounded-br-sm'
                             : isGoldenKB
-                                ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-300 text-gray-900'
-                                : 'bg-white border border-gray-200 text-gray-900'
-                        }`}>
-                        {isGoldenKB && (
-                            <div className="flex items-center space-x-2 mb-2 pb-2 border-b border-yellow-300">
-                                <svg className="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <span className="text-xs font-semibold text-yellow-700">Golden Knowledge Base</span>
-                            </div>
-                        )}
-                        <p className="text-sm md:text-base whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                                ? 'bg-gradient-to-b from-yellow-50 to-white text-gray-800 border border-yellow-200 rounded-2xl rounded-bl-sm'
+                                : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm'
+                        }`}
+                >
+                    {/* Golden KB Badge */}
+                    {isGoldenKB && (
+                        <div className="flex items-center space-x-1.5 mb-2 pb-2 border-b border-yellow-200/60">
+                            <svg className="w-3.5 h-3.5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-700">Verified Answer</span>
+                        </div>
+                    )}
 
-                        {/* Evidence Points */}
-                        {message.evidence_points && message.evidence_points.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-gray-200 space-y-1">
-                                {message.evidence_points.slice(0, 3).map((point, idx) => (
-                                    <div key={idx} className="flex items-start space-x-2 text-xs md:text-sm">
-                                        <span className="text-blue-600 mt-1">•</span>
-                                        <span className="text-gray-700">{point}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                    {/* Content */}
+                    <div className="whitespace-pre-wrap">{message.content}</div>
 
-                        {/* Risk Notes */}
-                        {message.risk_notes && message.risk_notes.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-red-200 space-y-1">
-                                <div className="text-xs font-semibold text-red-700 mb-1">⚠️ Risk Factors:</div>
-                                {message.risk_notes.slice(0, 2).map((note, idx) => (
-                                    <div key={idx} className="text-xs text-red-600">• {note}</div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    {/* Evidence Points */}
+                    {message.evidence_points && message.evidence_points.length > 0 && (
+                        <div className="mt-3 pt-2 space-y-1">
+                            {message.evidence_points.slice(0, 3).map((point, idx) => (
+                                <div key={idx} className="flex items-start text-xs text-gray-600 bg-gray-50/50 p-1.5 rounded">
+                                    <span className="text-blue-500 mr-2 mt-0.5">●</span>
+                                    <span>{point}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
-                    <div className="text-xs text-gray-400 mt-1 px-2">
+                    {/* Risk Factors */}
+                    {message.risk_notes && message.risk_notes.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-red-100">
+                            <div className="flex items-center text-xs font-bold text-red-600 mb-1">
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                Risk Factors
+                            </div>
+                            {message.risk_notes.slice(0, 2).map((note, idx) => (
+                                <div key={idx} className="text-xs text-red-600/90 pl-4 relative">
+                                    <span className="absolute left-0 top-1.5 w-1 h-1 bg-red-400 rounded-full"></span>
+                                    {note}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Timestamp */}
+                    <div className={`text-[10px] mt-1.5 text-right opacity-60 ${isUser ? 'text-white' : 'text-gray-500'}`}>
                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                 </div>

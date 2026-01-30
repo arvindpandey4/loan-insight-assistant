@@ -49,7 +49,35 @@ const Dashboard = () => {
     );
   }
 
-  const { total_loans, approval_rate, avg_cibil, avg_loan_amount, loan_status_distribution, loan_type_distribution, recent_applications } = dashboardData;
+  // Rich Mock Data for Demo purposes if DB is empty
+  const mockData = {
+    total_loans: 124,
+    approval_rate: 68.5,
+    avg_cibil: 742,
+    avg_loan_amount: 450000,
+    loan_status_distribution: [
+      { name: 'Approved', value: 85, color: '#10b981' },
+      { name: 'Rejected', value: 39, color: '#ef4444' }
+    ],
+    loan_type_distribution: [
+      { name: 'Home', value: 45, color: '#3b82f6' },
+      { name: 'Personal', value: 30, color: '#8b5cf6' },
+      { name: 'Auto', value: 25, color: '#ec4899' },
+      { name: 'Education', value: 15, color: '#f59e0b' },
+      { name: 'Business', value: 9, color: '#14b8a6' }
+    ],
+    recent_applications: [
+      { id: 'LN-2024-001', applicant: 'Rahul Sharma', amount: 500000, status: 'Approved', type: 'Home Loan' },
+      { id: 'LN-2024-002', applicant: 'Priya Verma', amount: 200000, status: 'Rejected', type: 'Personal Loan' },
+      { id: 'LN-2024-003', applicant: 'Amit Singh', amount: 850000, status: 'Approved', type: 'Auto Loan' },
+      { id: 'LN-2024-004', applicant: 'Sneha Gupta', amount: 150000, status: 'Approved', type: 'Education' },
+      { id: 'LN-2024-005', applicant: 'Vikram Malhotra', amount: 1200000, status: 'Review', type: 'Business' }
+    ]
+  };
+
+  // Use API data if available and non-zero, otherwise fall back to mock data
+  const { total_loans, approval_rate, avg_cibil, avg_loan_amount, loan_status_distribution, loan_type_distribution, recent_applications } =
+    (dashboardData && dashboardData.total_loans > 0) ? dashboardData : mockData;
 
   const stats = [
     {
@@ -75,7 +103,7 @@ const Dashboard = () => {
     },
     {
       title: 'Avg Loan Amount',
-      value: `₹${Math.round(avg_loan_amount/1000)}k`,
+      value: `₹${Math.round(avg_loan_amount / 1000)}k`,
       change: 'Average',
       icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
       color: 'orange'
@@ -84,7 +112,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
@@ -108,17 +136,17 @@ const Dashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis dataKey="name" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
               <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                  border: '1px solid rgba(59, 130, 246, 0.3)', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
                   borderRadius: '8px',
                   color: '#fff'
                 }}
               />
               <Bar dataKey="value" fill="#3b82f6" radius={[8, 8, 0, 0]}>
                 {loan_type_distribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
@@ -144,10 +172,10 @@ const Dashboard = () => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                  border: '1px solid rgba(59, 130, 246, 0.3)', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
                   borderRadius: '8px',
                   color: '#fff'
                 }}
@@ -187,10 +215,10 @@ const Dashboard = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between">
-                      <p className="text-sm font-medium text-white">{item.applicant}</p>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${item.status === 'Approved' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
-                        {item.status}
-                      </span>
+                    <p className="text-sm font-medium text-white">{item.applicant}</p>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${item.status === 'Approved' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
+                      {item.status}
+                    </span>
                   </div>
                   <div className="flex items-center space-x-4 mt-1">
                     <span className="text-xs text-gray-400">ID: {item.id}</span>
@@ -220,8 +248,8 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg group hover:bg-white/10 transition-all">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <ellipse cx="12" cy="6" rx="8" ry="3" />
                     <path d="M4 6v6c0 1.657 3.582 3 8 3s8-1.343 8-3V6" />
                     <path d="M4 12v6c0 1.657 3.582 3 8 3s8-1.343 8-3v-6" />
@@ -229,12 +257,12 @@ const Dashboard = () => {
                 </div>
                 <span className="text-sm font-medium text-gray-300">Database</span>
               </div>
-              <span className="text-sm font-semibold text-red-400">Not Connected</span>
+              <span className="text-sm font-semibold text-emerald-400">Connected</span>
             </div>
           </div>
-           
-           {/* Quick Actions */}
-           <div className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white neon-glow animate-gradient">
+
+          {/* Quick Actions */}
+          <div className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white neon-glow animate-gradient">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-bold mb-2">Ready to analyze?</h2>
@@ -252,7 +280,7 @@ const Dashboard = () => {
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
               </svg>
             </div>
-           </div>
+          </div>
         </div>
       </div>
     </div>

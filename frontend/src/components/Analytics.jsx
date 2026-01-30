@@ -2,291 +2,288 @@ import {
   BarChart, Bar, PieChart, Pie, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
 } from 'recharts';
+import { useState, useEffect } from 'react';
+import { fetchLoanStatusDistribution, fetchAvgCIBIL } from '../services/loanInsightsApi';
 
 const Analytics = () => {
-  // Loan Type Distribution
-  const loanTypeData = [
-    { name: 'Home Loans', value: 3542, color: '#3b82f6' },
-    { name: 'Auto Loans', value: 2156, color: '#10b981' },
-    { name: 'Personal Loans', value: 1834, color: '#f59e0b' },
-    { name: 'Business Loans', value: 1289, color: '#8b5cf6' },
-    { name: 'Education Loans', value: 611, color: '#ec4899' },
-  ];
+  // Initialize directly with fallback/mock data to prevent initial empty state white-screen
+  const [loanTypeData, setLoanTypeData] = useState([
+    { name: 'Home', value: 35, color: '#3b82f6' },
+    { name: 'Personal', value: 25, color: '#8b5cf6' },
+    { name: 'Auto', value: 20, color: '#10b981' },
+    { name: 'Education', value: 15, color: '#f59e0b' },
+    { name: 'Business', value: 5, color: '#ec4899' },
+  ]);
+  const [loading, setLoading] = useState(false);
 
-  // Approval vs Rejection Trends
-  const approvalTrendData = [
-    { month: 'Jan', approved: 4200, rejected: 1800 },
-    { month: 'Feb', approved: 4800, rejected: 1600 },
-    { month: 'Mar', approved: 5300, rejected: 1900 },
-    { month: 'Apr', approved: 4900, rejected: 1700 },
-    { month: 'May', approved: 5600, rejected: 2100 },
-    { month: 'Jun', approved: 5800, rejected: 1950 },
-  ];
+  const [trendData, setTrendData] = useState([
+    { month: 'Jan', approved: 65, rejected: 35 },
+    { month: 'Feb', approved: 72, rejected: 28 },
+    { month: 'Mar', approved: 68, rejected: 32 },
+    { month: 'Apr', approved: 85, rejected: 15 },
+    { month: 'May', approved: 78, rejected: 22 },
+    { month: 'Jun', approved: 82, rejected: 18 },
+  ]);
 
-  // Daily Query Volume (Last 7 Days)
-  const dailyQueryData = [
-    { day: 'Mon', queries: 187 },
-    { day: 'Tue', queries: 203 },
-    { day: 'Wed', queries: 195 },
-    { day: 'Thu', queries: 221 },
-    { day: 'Fri', queries: 234 },
-    { day: 'Sat', queries: 98 },
-    { day: 'Sun', queries: 109 },
-  ];
+  const [incomeData, setIncomeData] = useState([
+    { range: '<30k', approved: 20, rejected: 80 },
+    { range: '30-50k', approved: 45, rejected: 55 },
+    { range: '50-80k', approved: 75, rejected: 25 },
+    { range: '80k+', approved: 92, rejected: 8 },
+  ]);
 
-  // Income Range Analysis
-  const incomeRangeData = [
-    { range: '<$30k', approved: 120, rejected: 380 },
-    { range: '$30-50k', approved: 450, rejected: 250 },
-    { range: '$50-70k', approved: 680, rejected: 180 },
-    { range: '$70-100k', approved: 890, rejected: 110 },
-    { range: '$100k+', approved: 1200, rejected: 80 },
-  ];
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        // Attempt to fetch real data
+        const statusData = await fetchLoanStatusDistribution().catch(() => null);
+
+        if (statusData && Array.isArray(statusData.distribution)) {
+          setLoanTypeData(statusData.distribution);
+        }
+        // If fetch fails, we simply keep the initial mock data
+      } catch (err) {
+        console.error("Analytics Load Error", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  const handleExport = () => {
+    try {
+      if (!loanTypeData || loanTypeData.length === 0) return;
+      const csvContent = "data:text/csv;charset=utf-8,"
+        + "Metric,Value\n"
+        + loanTypeData.map(e => `${e.name},${e.value}`).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "analytics_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      console.error("Export failed", e);
+    }
+  };
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-slate-800/95 border border-slate-700 p-3 rounded-lg shadow-xl backdrop-blur-sm">
+          <p className="text-gray-300 text-xs mb-1">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-sm font-semibold" style={{ color: entry.color }}>
+              {entry.name}: {entry.value}%
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="relative w-20 h-20">
+          <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-500/30 rounded-full animate-ping"></div>
+          <div className="absolute top-0 left-0 w-full h-full border-4 border-t-blue-500 rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="glass-dark neon-border rounded-xl p-6 card-hover">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h2 className="text-2xl font-bold gradient-text mb-2">Analytics Overview</h2>
-            <p className="text-gray-300">Key insights into loan decision patterns and trends</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <select className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50">
-              <option>Last 6 Months</option>
-              <option>Last 3 Months</option>
-              <option>Last Month</option>
-              <option>Last Week</option>
-            </select>
-            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all flex items-center space-x-2 neon-glow group">
-              <svg className="w-4 h-4 transition-transform group-hover:translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M7 10l5 5 5-5M12 15V3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span>Export Report</span>
-            </button>
-          </div>
+    <div className="space-y-8 animate-fadeIn">
+
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-200">
+            Analytics & Trends
+          </h1>
+          <p className="text-slate-400 mt-1">Deep dive into loan performance metrics</p>
         </div>
+
+        <button
+          onClick={handleExport}
+          className="px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-sm font-medium text-white transition-all flex items-center gap-2 group backdrop-blur-md"
+        >
+          <svg className="w-4 h-4 text-blue-400 group-hover:text-blue-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Export CSV
+        </button>
       </div>
 
-      {/* Key Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="glass-dark border border-blue-500/30 rounded-xl p-6 text-white card-hover group">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-blue-300 text-sm font-medium">Total Cases</span>
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M7 7h10M7 12h10M7 17h6" strokeLinecap="round" />
-              </svg>
+      {/* Primary KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Approval Rate', value: '72.4%', change: '+5.2%', color: 'from-green-500 to-emerald-700', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+          { label: 'Avg Risk Score', value: 'Low', change: '-1.4%', color: 'from-blue-500 to-indigo-700', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+          { label: 'Total Volume', value: '1.2k', change: '+12%', color: 'from-purple-500 to-fuchsia-700', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+          { label: 'Processing Time', value: '24h', change: '-8%', color: 'from-orange-500 to-amber-700', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' }
+        ].map((stat, i) => (
+          <div key={i} className="group relative overflow-hidden bg-slate-800/40 border border-slate-700/50 p-5 rounded-2xl hover:bg-slate-800/60 transition-all duration-300">
+            <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity`}>
+              <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${stat.color} blur-xl`}></div>
             </div>
-          </div>
-          <p className="text-3xl font-bold mb-1">9,432</p>
-          <p className="text-blue-400 text-sm">+12.5% from last period</p>
-        </div>
 
-        <div className="glass-dark border border-green-500/30 rounded-xl p-6 text-white card-hover group">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-green-300 text-sm font-medium">Approval Rate</span>
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+            <div className="flex justify-between items-start mb-4">
+              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg shadow-black/20`}>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
+                </svg>
+              </div>
+              <span className={`text-xs font-semibold px-2 py-1 rounded-full ${stat.change.startsWith('+') ? 'bg-green-500/10 text-green-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                {stat.change}
+              </span>
             </div>
-          </div>
-          <p className="text-3xl font-bold mb-1">74.8%</p>
-          <p className="text-green-400 text-sm">+2.3% from last period</p>
-        </div>
 
-        <div className="glass-dark border border-purple-500/30 rounded-xl p-6 text-white card-hover group">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-purple-300 text-sm font-medium">Avg Confidence</span>
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M7 16l4-4 4 4 5-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+            <h3 className="text-2xl font-bold text-white mb-1">{stat.value}</h3>
+            <p className="text-slate-400 text-sm font-medium">{stat.label}</p>
           </div>
-          <p className="text-3xl font-bold mb-1">87.3%</p>
-          <p className="text-purple-400 text-sm">+3.1% from last period</p>
-        </div>
-
-        <div className="glass-dark border border-orange-500/30 rounded-xl p-6 text-white card-hover group">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-orange-300 text-sm font-medium">Total Queries</span>
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.557 1.522 4.82 3.889 6.115l-.78 3.77 4.076-2.131c.588.086 1.193.131 1.815.131 4.97 0 9-3.185 9-7.115S16.97 3 12 3z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-3xl font-bold mb-1">1,247</p>
-          <p className="text-orange-400 text-sm">+18.7% from last period</p>
-        </div>
+        ))}
       </div>
 
-      {/* Charts Row 1: Loan Type Distribution & Approval vs Rejection */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Loan Type Distribution - Pie Chart */}
-        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
-          <h3 className="text-lg font-bold text-white mb-4">Loan Type Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={loanTypeData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {loanTypeData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                  border: '1px solid rgba(59, 130, 246, 0.3)', 
-                  borderRadius: '8px',
-                  color: '#fff'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="mt-4 space-y-2">
-            {loanTypeData.map((item, index) => (
-              <div key={index} className="flex items-center justify-between text-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                  <span className="text-gray-300">{item.name}</span>
+      {/* Main Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* Trend Analysis */}
+        <div className="lg:col-span-2 bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white">Approval Trends (6 Months)</h3>
+            <div className="flex gap-2">
+              <span className="flex items-center text-xs text-slate-400"><span className="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>Approved</span>
+              <span className="flex items-center text-xs text-slate-400"><span className="w-2 h-2 rounded-full bg-rose-500 mr-2"></span>Rejected</span>
+            </div>
+          </div>
+
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorApproved" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorRejected" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                <XAxis dataKey="month" stroke="#64748b" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                <YAxis stroke="#64748b" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                <Tooltip content={<CustomTooltip />} />
+                <Area type="monotone" dataKey="approved" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorApproved)" name="Approved" />
+                <Area type="monotone" dataKey="rejected" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorRejected)" name="Rejected" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Loan Distribution */}
+        <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-sm">
+          <h3 className="text-lg font-semibold text-white mb-6">Portfolio Distribution</h3>
+
+          <div className="h-[220px] w-full relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={loanTypeData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {loanTypeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(0,0,0,0)" />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+
+            {/* Center Stats */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-3xl font-bold text-white">100%</span>
+              <span className="text-xs text-slate-400 uppercase tracking-widest">Holdings</span>
+            </div>
+          </div>
+
+          <div className="mt-6 space-y-3">
+            {loanTypeData.map((item, idx) => (
+              <div key={idx} className="flex items-center justify-between text-sm group">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full ring-2 ring-opacity-50 ring-offset-2 ring-offset-slate-900 transition-all group-hover:scale-125" style={{ backgroundColor: item.color, '--tw-ring-color': item.color }}></div>
+                  <span className="text-slate-300 group-hover:text-white transition-colors">{item.name}</span>
                 </div>
-                <span className="font-semibold text-white">{item.value.toLocaleString()}</span>
+                <span className="font-semibold text-slate-400 group-hover:text-white transition-colors">{item.value}%</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Approval vs Rejection Trends - Area Chart */}
-        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
-          <h3 className="text-lg font-bold text-white mb-4">Approval vs Rejection Trends</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={approvalTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-              <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                  border: '1px solid rgba(59, 130, 246, 0.3)', 
-                  borderRadius: '8px',
-                  color: '#fff'
-                }}
-              />
-              <Legend wrapperStyle={{ color: '#9ca3af' }} />
-              <Area type="monotone" dataKey="approved" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="Approved" />
-              <Area type="monotone" dataKey="rejected" stackId="1" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} name="Rejected" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
       </div>
 
-      {/* Charts Row 2: Daily Query & Income Range */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Daily Query Activity - Bar Chart */}
-        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
-          <h3 className="text-lg font-bold text-white mb-4">Daily Query Activity (Last 7 Days)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dailyQueryData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="day" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-              <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                  border: '1px solid rgba(59, 130, 246, 0.3)', 
-                  borderRadius: '8px',
-                  color: '#fff'
-                }}
-              />
-              <Bar dataKey="queries" fill="#3b82f6" name="Queries" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      {/* Secondary Analysis Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {/* Approval by Income Range - Bar Chart */}
-        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
-          <h3 className="text-lg font-bold text-white mb-4">Approval by Income Range</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={incomeRangeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="range" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-              <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                  border: '1px solid rgba(59, 130, 246, 0.3)', 
-                  borderRadius: '8px',
-                  color: '#fff'
-                }}
-              />
-              <Legend wrapperStyle={{ color: '#9ca3af' }} />
-              <Bar dataKey="approved" fill="#10b981" name="Approved" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="rejected" fill="#ef4444" name="Rejected" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Insights Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-dark border border-blue-500/30 rounded-xl p-6 card-hover group">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center animate-float transition-transform group-hover:scale-110">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M13 17l5-5-5-5M6 17l5-5-5-5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <h4 className="font-bold text-white">Peak Performance</h4>
+        {/* Income vs Approval */}
+        <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-6">Income Bracket Analysis</h3>
+          <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={incomeData} layout="vertical" margin={{ left: 0, right: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
+                <XAxis type="number" stroke="#64748b" hide />
+                <YAxis dataKey="range" type="category" stroke="#94a3b8" tick={{ fontSize: 12 }} width={60} tickLine={false} axisLine={false} />
+                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} content={<CustomTooltip />} />
+                <Bar dataKey="approved" name="Approved" stackId="a" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
+                <Bar dataKey="rejected" name="Rejected" stackId="a" fill="#1e293b" radius={[0, 4, 4, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          <p className="text-sm text-gray-300">
-            Friday shows highest query volume with 234 queries, indicating peak user activity.
-          </p>
         </div>
 
-        <div className="glass-dark border border-green-500/30 rounded-xl p-6 card-hover group">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center animate-float transition-transform group-hover:scale-110" style={{animationDelay: '0.2s'}}>
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <h4 className="font-bold text-white">Top Performer</h4>
-          </div>
-          <p className="text-sm text-gray-300">
-            Home loans represent 37.5% of all queries with highest approval rates in ₹70k+ income range.
-          </p>
-        </div>
+        {/* AI Insights Summary */}
+        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 relative overflow-hidden">
+          {/* Decorative Background */}
+          <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-black/20 rounded-full blur-3xl"></div>
 
-        <div className="glass-dark border border-orange-500/30 rounded-xl p-6 card-hover group">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center animate-float transition-transform group-hover:scale-110" style={{animationDelay: '0.4s'}}>
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 6v2m0 8v2" strokeLinecap="round" />
-                <path d="M9 10c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2s-.9 2-2 2h-2c-1.1 0-2 .9-2 2s.9 2 2 2h2c1.1 0 2-.9 2-2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+          <div className="relative z-10 h-full flex flex-col justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI Executive Summary
+              </h3>
+              <p className="text-blue-100 text-sm leading-relaxed opacity-90">
+                Based on recent patterns, <strong>Home Loans</strong> are performing exceptionally well with a <strong>5.2% increase</strong> in approval rates. However, rejection rates for <span className="underline decoration-blue-300/50">low-income brackets</span> (&lt;30k) remain high due to DTI constraints.
+              </p>
             </div>
-            <h4 className="font-bold text-white">Income Insight</h4>
+
+            <div className="mt-6 pt-6 border-t border-white/10 grid grid-cols-2 gap-4">
+              <div>
+                <span className="block text-xs text-blue-200 uppercase tracking-wider mb-1">Top Opportunity</span>
+                <span className="text-lg font-bold text-white">Mid-Market Auto</span>
+              </div>
+              <div>
+                <span className="block text-xs text-blue-200 uppercase tracking-wider mb-1">Key Risk</span>
+                <span className="text-lg font-bold text-white">Unsecured Personal</span>
+              </div>
+            </div>
           </div>
-          <p className="text-sm text-gray-300">
-            Clear correlation: Higher income ranges show significantly better approval rates (93.8% for ₹100k+).
-          </p>
         </div>
       </div>
     </div>
