@@ -178,7 +178,7 @@ const ConversationalChat = () => {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-200px)] bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-xl overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-6rem)] bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-xl overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 shadow-lg">
                 <div className="flex items-center justify-between">
