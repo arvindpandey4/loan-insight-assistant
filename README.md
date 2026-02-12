@@ -1,4 +1,4 @@
-# 🏦 Loan Insight Assistant - AI-Powered RAG System
+# 🏦 LoanX - Loan Insight Assistant and AI-Powered RAG System
 
 <div align="center">
 
